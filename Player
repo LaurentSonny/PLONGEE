@@ -1,0 +1,28 @@
+import java.util.ArrayList;
+import java.util.List;
+
+public class Player {
+	String name;
+	int treasureCount;
+	Level currentLevel;
+
+	public Player(String name, int treasureCount, Level currentLevel) {
+		this.name=name;
+		this.treasureCount=treasureCount;
+		this.currentLevel=currentLevel;
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+	
+	public void GetNextMove (Game game) {
+		List<Player> eux= new ArrayList<>();
+		List<Chest> coffre= new ArrayList<>();
+		Level uno =new Level(coffre,eux);
+		List<Player> nous= new ArrayList<>();
+		Game jeu = new Game(3,nous,7);
+	}	
+
+}
