@@ -1,0 +1,18 @@
+import java.util.ArrayList;
+import java.util.List;
+
+public class Level {
+	List<Chest> chests = new ArrayList<>();
+	List<Player> players = new ArrayList<>();
+
+	public Level(List<Chest> chests, List<Player> players) {
+		this.chests = chests;
+		this.players = players;
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
+}
