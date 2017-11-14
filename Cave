@@ -1,0 +1,16 @@
+import java.util.ArrayList;
+import java.util.List;
+
+public class Cave {
+	List<Level> levels = new ArrayList<>();
+
+	public Cave(List<Level> levels) {
+		this.levels = levels;
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
+}
