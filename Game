@@ -1,0 +1,35 @@
+import java.util.ArrayList;
+import java.util.List;
+
+public class Game {
+	public int oxygen;
+	List<Player> playlist = new ArrayList<>();
+	int phaseNumber;
+
+	public Game(int oxygen, List<Player> playlist, int phaseNumber) {
+		this.oxygen = oxygen;
+		this.playlist = playlist;
+		this.phaseNumber = phaseNumber;
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+	}
+
+	public void PlayTurn() {
+
+	}
+
+	public void Init(int playerCount) {
+
+	}
+
+	public void CaculateScore() {
+
+	}
+
+	public void LaunchGame() {
+
+	}
+
+}
