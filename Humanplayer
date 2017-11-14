@@ -1,0 +1,14 @@
+
+public class Humanplayer extends Player {
+
+	public Humanplayer(String name, int treasureCount, Level currentLevel) {
+		super(name, treasureCount, currentLevel);
+		// TODO Auto-generated constructor stub
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
+}
