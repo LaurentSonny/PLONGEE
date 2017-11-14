@@ -1,0 +1,20 @@
+import java.util.ArrayList;
+import java.util.List;
+
+public class Chest {
+	int treasureCount;
+
+	public Chest(int treasureCount) {
+		this.treasureCount = treasureCount;
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+	
+	public void OpenChest(Player player) {
+		
+	}
+
+}
