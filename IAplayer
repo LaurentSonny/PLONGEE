@@ -1,0 +1,13 @@
+public class IAplayer extends Player {
+
+	public IAplayer(String name, int treasureCount, Level currentLevel) {
+		super(name, treasureCount, currentLevel);
+		// TODO Auto-generated constructor stub
+	}
+
+	public static void main(String[] args) {
+		// TODO Auto-generated method stub
+
+	}
+
+}
