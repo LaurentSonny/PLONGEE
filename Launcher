@@ -1,8 +1,41 @@
+import java.util.ArrayList;
+import java.util.List;
+
 public class Launcher {
+	int Oxygen_Bottles = 3;
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+		// Classe de création de la partie
+		/*
+		 * Règles: 2 joueurs, 3 bouteilles d'oxygene, 3 caves séparées en niveaux de
+		 * profondeur, Chaque niveau contient un tresor, Chaque mouvement coute 1 oxygene.
+		 */
+		
+		List<Level> Levelcave1= new ArrayList<>();
+		Level surface = new Level (0);
+		Level uno =new Level(1);
+		Level dos =new Level(1);
+		Level tres =new Level(1);		
+		Levelcave1.add(surface);
+		Levelcave1.add(uno);
+		Levelcave1.add(dos);
+		Levelcave1.add(tres);
+		List<Level> Levelcave2= new ArrayList<>();
+		Level eins =new Level(1);
+		Level zwei =new Level(1);
+		Level drei =new Level(1);		
+		Levelcave1.add(eins);
+		Levelcave1.add(zwei);
+		Levelcave1.add(drei);
+		Cave Cave1 = new Cave (1,Levelcave1); 
+		Cave Cave2 = new Cave (2,Levelcave2); 
+		List<Player> Ttlesjoueurs= new ArrayList<>();
+		Player Sonny = new Player("Sonny",0,surface);
+		Player Chaymaa = new Player("Chaymaa",0,surface);
+		Ttlesjoueurs.add(Sonny);
+		Ttlesjoueurs.add(Chaymaa);
+		Game Jeu = new Game((Levelcave1.size()),Ttlesjoueurs,1);
+		Game.main(args);
 	}
-
+	
 }
