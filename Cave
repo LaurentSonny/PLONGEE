@@ -2,9 +2,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Cave {
+	int Cavetype;
 	List<Level> levels = new ArrayList<>();
 
-	public Cave(List<Level> levels) {
+	public Cave(int Cavetype, List<Level> levels) {
+		this.Cavetype = Cavetype;
 		this.levels = levels;
 	}
 
