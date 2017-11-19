@@ -18,11 +18,7 @@ public class Player {
 	}
 	
 	public void GetNextMove (Game game) {
-		List<Player> eux= new ArrayList<>();
-		List<Chest> coffre= new ArrayList<>();
-		Level uno =new Level(coffre,eux);
-		List<Player> nous= new ArrayList<>();
-		Game jeu = new Game(3,nous,7);
+		
 	}	
 
 }
