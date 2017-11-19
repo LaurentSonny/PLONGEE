@@ -2,12 +2,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Level {
-	List<Chest> chests = new ArrayList<>();
-	List<Player> players = new ArrayList<>();
+	int chests ;
 
-	public Level(List<Chest> chests, List<Player> players) {
+	public Level(Integer chests) {
 		this.chests = chests;
-		this.players = players;
 	}
 
 	public static void main(String[] args) {
