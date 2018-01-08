@@ -1,6 +1,6 @@
 # Plongee
-# J'ai peut etre trouver un truc sympa pour inserer un gif dès le lancement de jeu
-# J'ai trouvé plusieurs gifs sympa que l'on pourrait utiliser! Je te montrerai ça à la rentrée 
+# J'ai peut etre trouvé un truc sympa pour inserer un gif dès le lancement de jeu
+# J'ai trouvé plusieurs gifs sympas que l'on pourrait utiliser! Je te montrerai ça à la rentrée 
 
 package pkg;
  
