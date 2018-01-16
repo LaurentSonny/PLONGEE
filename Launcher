@@ -1,8 +1,86 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Random;
+
 public class Launcher {
 
 	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-
+		// Classe de création de la partie
+		/*
+		 * Règles: 2 joueurs, 3 bouteilles d'oxygene, 3 caves séparées en niveaux de
+		 * profondeur, Chaque niveau contient un tresor, Chaque mouvement coute 1
+		 * oxygene.
+		 */
+		Scanner scanner = new Scanner(System.in);
+		Random random = new Random();
+		System.out.print("Veuillez entrer un nombre de joueurs :");
+		int nbjoueurs = scanner.nextInt();
+		nbjoueurs = 1;
+		System.out.println("Il y a 3 caves");
+		List<Cave> TteslesCaves = new ArrayList<>();
+		List<Player> Ttlesjoueurs = new ArrayList<>();
+		TteslesCaves = caveListCreator(2);
+		Ttlesjoueurs = playerCreator(nbjoueurs);
+		int oxygen = oxygenAmount(TteslesCaves);
+		System.out.println("Vous avez droit à " + oxygen + " unités d'oxygène");
+		Game Jeu = new Game(50, 1, Ttlesjoueurs, TteslesCaves);
+		Jeu.gameplay();
 	}
 
+	public static List<Chest> chestListCreator(int chstnumber, int cavetype) {
+		List<Chest> chestlist = new ArrayList<>();
+		if (cavetype != 99) {
+			for (int i = 0; i < chstnumber; ++i) {
+				Chest chest = new Chest(cavetype + 1);
+				chestlist.add(chest);
+			}
+		}
+		return (chestlist);
+	}
+
+	public static List<Level> levelListCreator(int lvlnumber, int cavetype) {
+		List<Level> Levelcave = new ArrayList<>();
+		for (int i = 0; i < lvlnumber; ++i) {
+			Level level = new Level(i, chestListCreator(1, cavetype));
+			Levelcave.add(level);
+		}
+		return (Levelcave);
+	}
+
+	public static List<Cave> caveListCreator(int cavenumber) {
+		Random random = new Random();
+		List<Cave> cavelist = new ArrayList<>();
+		int lvlnumber;
+		System.out.println("La surface à pour longueur : 1");
+		Cave surface = new Cave(99, levelListCreator(1, 99));
+		cavelist.add(surface);
+		for (int i = 0; i < cavenumber; ++i) {
+			lvlnumber = random.nextInt(4) + (i * 3) + 2;
+			lvlnumber = 5;
+			System.out.println("La cave n°" + i + " à pour longueur : " + lvlnumber);
+			Cave cave = new Cave(i, levelListCreator(lvlnumber, i));
+			cavelist.add(cave);
+		}
+		return (cavelist);
+	}
+
+	public static List<Player> playerCreator(int plyrnumber) {
+		List<Player> playerlist = new ArrayList<Player>();
+		for (int i = 0; i < plyrnumber; ++i) {
+			List<Chest> playerchestlist = new ArrayList<>();
+			List<Chest> playerupchestlist = new ArrayList<>();
+			Player player = new Player("player" + (i + 1), playerchestlist, playerupchestlist, 0, 0);
+			playerlist.add(player);
+		}
+		return (playerlist);
+	}
+
+	public static int oxygenAmount(List<Cave> cavelist) {
+		int oxygen = 0;
+		for (Cave cave : cavelist) {
+			oxygen += cave.levels.size();
+		}
+		return (oxygen * 2);
+	}
 }
