@@ -1,7 +1,10 @@
+import java.util.List;
+
 public class IAplayer extends Player {
 
-	public IAplayer(String name, int treasureCount, Level currentLevel) {
-		super(name, treasureCount, currentLevel);
+	
+	public IAplayer(String name, List<Chest> playerchestlist, List<Chest> playerupchestlist, int currentlevel, int currentcave) {
+		super( name,  playerchestlist,  playerupchestlist,  currentlevel,  currentcave);
 		// TODO Auto-generated constructor stub
 	}
 
