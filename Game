@@ -1,34 +1,203 @@
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Random;
+import java.util.Scanner;
+import java.util.concurrent.Phaser;
 
 public class Game {
-	public int oxygen;
-	List<Player> playlist = new ArrayList<>();
-	int phaseNumber;
+	static int oxygen;
+	static int phasenumber;
+	static String action;
+	static Boolean confirmedaction = false;
+	static List<Integer> playingorderlist = new ArrayList<>();
+	static List<Player> playerlist = new ArrayList<Player>();
+	static List<Cave> cavelist = new ArrayList<Cave>();
+	static Random random = new Random();
 
-	public Game(int oxygen, List<Player> playlist, int phaseNumber) {
+	public Game(int oxygen, int phaseNumber, List<Player> playerlist, List<Cave> cavelist) {
 		this.oxygen = oxygen;
-		this.playlist = playlist;
-		this.phaseNumber = phaseNumber;
+		this.playerlist = playerlist;
+		this.cavelist = cavelist;
+		this.phasenumber = phasenumber;
 	}
 
-	public static void main(String[] args) {
-		// TODO Auto-generated method stub
-	}
-
-	public void PlayTurn() {
+	public static void main(String[] args, List<Player> playerlist, List<Cave> cavelist) {
 
 	}
 
-	public void Init(int playerCount) {
+	public static void gameplay() {
+		while (oxygen > 0) {
+			playingorderlist = playingOrder(playerlist);
+			for (int i : playingorderlist) {
+				confirmedaction = false;
+				while (!confirmedaction) {
+					Player joueur = playerlist.get(i);
+					Cave cave = cavelist.get(joueur.currentcave);
+					Level niveau = cave.levels.get(joueur.currentlevel);
+					Scanner sc = new Scanner(System.in);
+					System.out.println(joueur.name + " à votre tour de jouer, veuillez taper:\r\n M pour monter \r\n D pour descendre \r\n A pour recuperer un coffre ");
+					String action = sc.nextLine();
+					playTurn(joueur, cave, niveau, action);
+					System.out.println(joueur.name + " est à " + (joueur.currentlevel + 1) + " de profondeur dans la cave " + joueur.currentcave);
+					System.out.println("Il reste : " + oxygen + " d'oxygene");
+					testons(joueur,niveau);
+				}
+			}
+		}
+		
+	}
+
+	public static void playTurn(Player joueur, Cave cave, Level niveau, String action) {
+		if (action.equals("m")) {
+			if (niveau.Depth > 0) {
+				joueur.currentlevel--;
+				System.out.println(joueur.name + " est monté de 1 niveau");
+				oxygen -= breathing(joueur);
+				confirmedaction = true;
+			}
+			else {
+				if (joueur.currentcave > 0) {
+					joueur.currentlevel = cavelist.get(joueur.currentcave - 1).Max();
+					joueur.currentcave--;
+					System.out.println(joueur.name + " passe à la cave " + joueur.currentcave);
+					if (joueur.currentcave == 0) {
+						System.out.println(joueur.name + " se retrouve à la surface");
+						retourSurface(joueur);
+					}
+					oxygen -= breathing(joueur);
+					confirmedaction = true;
+				}
+				else {
+					System.out.println(joueur.name + " est deja à la surface");
+				}
+			}
+		}
+		else if (action.equals("d")) {
+			if (niveau.Depth < cave.Max()) {
+				joueur.currentlevel++;
+				System.out.println(joueur.name + " est descendu de 1 niveau");
+				oxygen -= breathing(joueur);
+				confirmedaction = true;
+			}
+			else {
+				if (joueur.currentcave < (cavelist.get(cavelist.size() - 1)).levels.size() - 1) {
+					joueur.currentlevel = 0;
+					joueur.currentcave++;
+					System.out.println(joueur.name + " passe à la cave " + joueur.currentcave);
+					oxygen -= breathing(joueur);
+					confirmedaction = true;
+				}
+				else {
+					System.out.println(joueur.name + " est deja au fond");
+				}
+			}
+		}
+		else if (action.equals("w")) {
+			oxygen = -10;
+		}
+		else {
+			if (niveau.Coffre_present()) {
+				System.out.println(joueur.name + " ... dommage il n'y a pas de coffre ici");
+			}
+			else {
+				int randomchest = random.nextInt(niveau.chestlist.size());
+				System.out.println(joueur.name + " recupere un coffre de type " + niveau.chestlist.get(randomchest).chestype);
+				Chest coffre = new Chest(niveau.chestlist.get(randomchest).chestype);
+				joueur.playerchestlist.add(coffre);
+				niveau.chestlist.remove(randomchest);
+				oxygen--;
+				confirmedaction = true;
+			}
+		}
+	}
+
+	public static void testons(Player joueur,Level niveau) {
+		System.out.println("");
+		System.out.println(cavelist.get(cavelist.size() - 1).levels.get(cavelist.get(cavelist.size() - 1).levels.size() - 1).chestlist.size() + " derniere cave");
+		System.out.println(niveau.chestlist.size() + " cave en cours");
+		System.out.println(joueur.playerchestlist.size() + " coffres en main");
+		System.out.println(joueur.playerupchestlist.size() + " a la surface");
+		System.out.println("");
+	}
+
+	public static List<Integer> playingOrder(List<Player> playerlist) {
+		List<Integer> order = new ArrayList<>();
+		List<Integer[]> disorder = new ArrayList<>();
+		Integer[] max = new Integer[2];
+		boolean found = false;
+		for (int i = 0; i < playerlist.size(); ++i) {
+			Integer[] association = new Integer[2];
+			Player joueur = playerlist.get(i);
+			association[0] = i;
+			association[1] = (joueur.currentcave * 13 + joueur.currentlevel);
+			disorder.add(association);
+		}
+
+		max = disorder.get(0);
+		while (!disorder.isEmpty()) {
+			found = false;
+			for (Integer i = 0; i < disorder.size(); ++i) {
+				if (disorder.get(i)[1] > max[1]) {
+					max = disorder.get(i);
+					found = true;
+				}
+			}
+			if (!found) {
+				int randomplayer = random.nextInt(disorder.size());
+				max = disorder.get(randomplayer);
+			}
+			order.add(max[0]);
+			disorder.remove(max);
+		}
+		return (order);
+	}
+
+	public static void retourSurface(Player joueur) {
+		for (Chest chests : joueur.playerchestlist) {
+			joueur.playerupchestlist.add(chests);
+		}
+		joueur.playerchestlist.removeAll(joueur.playerupchestlist);
 
 	}
 
-	public void CaculateScore() {
+	public static void oxygenEmpty() {
+		phasenumber++;
+		for (Player players : playerlist) {
+			for (Chest chests : players.playerchestlist) {
+				cavelist.get(cavelist.size() - 1).levels.get(cavelist.get(cavelist.size() - 1).levels.size() - 1).chestlist.add(chests);
+				players.playerchestlist.remove(chests);
+				players.currentcave = 0;
+				players.currentlevel = 0;
+				levelRemoval(cavelist);
+			}
+			for (Chest chests : players.playerupchestlist) {
+				players.score += chests.openChest();
+			}
+			System.out.println(players.name + " a gagné " + players.score + " trésors");
+		}
+	}
+
+	public static int breathing(Player joueur) {
+		return (joueur.playerchestlist.size() + 1);
 
 	}
 
-	public void LaunchGame() {
+	public static void levelRemoval(List<Cave> cavelisting) {
+		for (Cave cave : cavelisting) {
+			for (Level level : cave.levels) {
+				if (level.chestlist.isEmpty()) {
+					cave.levels.remove(level);
+				}
+			}
+		}
+	}
+
+	public void caculateScore() {
+
+	}
+
+	public void launchGame() {
 
 	}
 
