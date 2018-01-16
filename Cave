@@ -1,18 +1,23 @@
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class Cave {
-	int Cavetype;
-	List<Level> levels = new ArrayList<>();
+	int cavetype;
+	List<Level> levels = new ArrayList<Level>();
 
-	public Cave(int Cavetype, List<Level> levels) {
-		this.Cavetype = Cavetype;
+	public Cave(int cavetype, List<Level> levels) {
+		this.cavetype = cavetype;
 		this.levels = levels;
 	}
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
+	}
+
+	public int Max() {
+		return (levels.size() - 1);
 	}
 
 }
