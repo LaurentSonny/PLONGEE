@@ -3,13 +3,19 @@ import java.util.List;
 
 public class Player {
 	String name;
-	int treasureCount;
-	Level currentLevel;
+	List<Chest> playerchestlist = new ArrayList<Chest>();
+	List<Chest> playerupchestlist = new ArrayList<Chest>();
+	int currentlevel;
+	int currentcave;
+	int score;
 
-	public Player(String name, int treasureCount, Level currentLevel) {
-		this.name=name;
-		this.treasureCount=treasureCount;
-		this.currentLevel=currentLevel;
+	public Player(String name, List<Chest> playerchestlist, List<Chest> playerupchestlist, int currentlevel, int currentcave) {
+		// TODO Auto-generated constructor stub
+		this.name = name;
+		this.playerchestlist = playerchestlist;
+		this.playerupchestlist = playerupchestlist;
+		this.currentlevel = currentlevel;
+		this.currentcave = currentcave;
 	}
 
 	public static void main(String[] args) {
@@ -17,12 +23,6 @@ public class Player {
 
 	}
 	
-	public void GetNextMove (Game game) {
-		List<Player> eux= new ArrayList<>();
-		List<Chest> coffre= new ArrayList<>();
-		Level uno =new Level(coffre,eux);
-		List<Player> nous= new ArrayList<>();
-		Game jeu = new Game(3,nous,7);
-	}	
+	
 
 }
