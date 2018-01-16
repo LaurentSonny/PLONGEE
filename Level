@@ -2,10 +2,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Level {
-	int chests ;
+	int Depth;
+	List<Chest> chestlist = new ArrayList<Chest>();
 
-	public Level(Integer chests) {
-		this.chests = chests;
+	public Level( Integer Depth,List<Chest> chestlist) {
+		this.Depth = Depth;
+		this.chestlist=chestlist;
 	}
 
 	public static void main(String[] args) {
@@ -13,4 +15,10 @@ public class Level {
 
 	}
 
+	public boolean Coffre_present() {
+		return (chestlist.isEmpty());
+	}
+	
+	
+	
 }
