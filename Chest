@@ -1,17 +1,22 @@
-public class Chest {
-	int treasureCount;
+import java.util.Random;
 
-	public Chest(int treasureCount) {
-		this.treasureCount = treasureCount;
+public class Chest {
+	int chestype;
+
+	public Chest(int chestype) {
+		this.chestype = chestype;
 	}
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
 
 	}
-	
-	public void OpenChest(Player player) {
-		
+
+	public int openChest() {
+		Random random = new Random();
+		int i = 0;
+		i = random.nextInt(3) + 3 * chestype;
+		return (i);
 	}
 
 }
