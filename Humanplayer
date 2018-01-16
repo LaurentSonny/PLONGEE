@@ -1,8 +1,9 @@
+import java.util.List;
 
 public class Humanplayer extends Player {
 
-	public Humanplayer(String name, int treasureCount, Level currentLevel) {
-		super(name, treasureCount, currentLevel);
+	public Humanplayer(String name, List<Chest> playerchestlist, List<Chest> playerupchestlist, int currentlevel, int currentcave) {
+		super( name,  playerchestlist,  playerupchestlist,  currentlevel,  currentcave);
 		// TODO Auto-generated constructor stub
 	}
 
