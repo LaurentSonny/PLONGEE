@@ -14,18 +14,24 @@ public class Launcher {
 		 */
 		Scanner scanner = new Scanner(System.in);
 		Random random = new Random();
-		System.out.print("Veuillez entrer un nombre de joueurs :");
+		System.out.print("Veuillez entrer le nombre de joueurs :");
 		int nbjoueurs = scanner.nextInt();
 		nbjoueurs = 1;
-		System.out.println("Il y a 3 caves");
+		/*
+		 * System.out.print("Veuillez entrer le nombre de parties :"); int nbparties =
+		 * scanner.nextInt();
+		 * System.out.print("Veuillez entrer un nombre de joueurs :"); int nbcaves =
+		 * scanner.nextInt();
+		 */
+		System.out.println("Il y a"/* nbcaves */ + " 3 caves");
 		List<Cave> TteslesCaves = new ArrayList<>();
 		List<Player> Ttlesjoueurs = new ArrayList<>();
 		TteslesCaves = caveListCreator(2);
 		Ttlesjoueurs = playerCreator(nbjoueurs);
 		int oxygen = oxygenAmount(TteslesCaves);
 		System.out.println("Vous avez droit à " + oxygen + " unités d'oxygène");
-		Game Jeu = new Game(50, 1, Ttlesjoueurs, TteslesCaves);
-		Jeu.gameplay();
+		Game Jeu = new Game(50, 3, Ttlesjoueurs, TteslesCaves);
+		Jeu.launchGame(/* nbparties */);
 	}
 
 	public static List<Chest> chestListCreator(int chstnumber, int cavetype) {
@@ -57,8 +63,8 @@ public class Launcher {
 		cavelist.add(surface);
 		for (int i = 0; i < cavenumber; ++i) {
 			lvlnumber = random.nextInt(4) + (i * 3) + 2;
-			lvlnumber = 5;
-			System.out.println("La cave n°" + i + " à pour longueur : " + lvlnumber);
+			lvlnumber = 3;
+			System.out.println("La cave n°" + (i+1) + " à pour longueur : " + lvlnumber);
 			Cave cave = new Cave(i, levelListCreator(lvlnumber, i));
 			cavelist.add(cave);
 		}
