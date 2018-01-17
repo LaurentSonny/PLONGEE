@@ -8,6 +8,7 @@ import java.util.concurrent.Phaser;
 public class Game {
 	static int oxygen;
 	static int phasenumber;
+	static int currentphase = 0;
 	static String action;
 	static Boolean confirmedaction = false;
 	static List<Integer> playingorderlist = new ArrayList<>();
@@ -17,13 +18,12 @@ public class Game {
 
 	public Game(int oxygen, int phaseNumber, List<Player> playerlist, List<Cave> cavelist) {
 		this.oxygen = oxygen;
+		this.phasenumber = phasenumber;
 		this.playerlist = playerlist;
 		this.cavelist = cavelist;
-		this.phasenumber = phasenumber;
 	}
 
 	public static void main(String[] args, List<Player> playerlist, List<Cave> cavelist) {
-
 	}
 
 	public static void gameplay() {
@@ -35,17 +35,29 @@ public class Game {
 					Player joueur = playerlist.get(i);
 					Cave cave = cavelist.get(joueur.currentcave);
 					Level niveau = cave.levels.get(joueur.currentlevel);
+					testons(joueur, niveau);
 					Scanner sc = new Scanner(System.in);
-					System.out.println(joueur.name + " à votre tour de jouer, veuillez taper:\r\n M pour monter \r\n D pour descendre \r\n A pour recuperer un coffre ");
+					System.out.println(joueur.name + " à votre tour de jouer, veuillez taper:\r\n m pour monter \r\n d pour descendre \r\n a pour recuperer un coffre ");
 					String action = sc.nextLine();
 					playTurn(joueur, cave, niveau, action);
+					System.out.println("");
 					System.out.println(joueur.name + " est à " + (joueur.currentlevel + 1) + " de profondeur dans la cave " + joueur.currentcave);
 					System.out.println("Il reste : " + oxygen + " d'oxygene");
-					testons(joueur,niveau);
+					System.out.println("--------------------------------------------------------------------------");
+				}
+				if (oxygen < 1) {
+					endPhase(playingorderlist);
 				}
 			}
 		}
-		
+		System.out.println("test plus d'oxygene :D");
+	}
+
+	public static void endPhase(List<Integer> playingorderlist) {
+		oxygenEmpty();
+		levelRemoval(cavelist);
+		playingorderlist.clear();
+		confirmedaction = true;
 	}
 
 	public static void playTurn(Player joueur, Cave cave, Level niveau, String action) {
@@ -77,11 +89,14 @@ public class Game {
 			if (niveau.Depth < cave.Max()) {
 				joueur.currentlevel++;
 				System.out.println(joueur.name + " est descendu de 1 niveau");
+				if (joueur.currentcave == cavelist.size() - 1) {
+					System.out.println(joueur.name + " se retrouve au fond");
+				}
 				oxygen -= breathing(joueur);
 				confirmedaction = true;
 			}
 			else {
-				if (joueur.currentcave < (cavelist.get(cavelist.size() - 1)).levels.size() - 1) {
+				if (joueur.currentcave < cavelist.size() - 1) {
 					joueur.currentlevel = 0;
 					joueur.currentcave++;
 					System.out.println(joueur.name + " passe à la cave " + joueur.currentcave);
@@ -94,9 +109,10 @@ public class Game {
 			}
 		}
 		else if (action.equals("w")) {
-			oxygen = -10;
+			oxygen = 0;
+			confirmedaction = true;
 		}
-		else {
+		else if (action.equals("a")) {
 			if (niveau.Coffre_present()) {
 				System.out.println(joueur.name + " ... dommage il n'y a pas de coffre ici");
 			}
@@ -110,12 +126,16 @@ public class Game {
 				confirmedaction = true;
 			}
 		}
+		else {
+			System.out.println("Commande inexistante, veuillez réessayer");
+		}
 	}
 
-	public static void testons(Player joueur,Level niveau) {
+	public static void testons(Player joueur, Level niveau) {
+		Level lastlevel = cavelist.get(cavelist.size() - 1).levels.get(cavelist.get(cavelist.size() - 1).levels.size() - 1);
 		System.out.println("");
-		System.out.println(cavelist.get(cavelist.size() - 1).levels.get(cavelist.get(cavelist.size() - 1).levels.size() - 1).chestlist.size() + " derniere cave");
-		System.out.println(niveau.chestlist.size() + " cave en cours");
+		System.out.println(lastlevel.chestlist.size() + " derniere cave dernier niveau");
+		System.out.println(niveau.chestlist.size() + " niveau en cours");
 		System.out.println(joueur.playerchestlist.size() + " coffres en main");
 		System.out.println(joueur.playerupchestlist.size() + " a la surface");
 		System.out.println("");
@@ -157,48 +177,53 @@ public class Game {
 		for (Chest chests : joueur.playerchestlist) {
 			joueur.playerupchestlist.add(chests);
 		}
-		joueur.playerchestlist.removeAll(joueur.playerupchestlist);
-
+		joueur.playerchestlist.clear();
 	}
 
 	public static void oxygenEmpty() {
-		phasenumber++;
+		System.out.println("L'oxygene est terminé");
+		System.out.println("La phase " + currentphase + " est terminée, tous les joueurs sont envoyés a la surface, \r\nles coffres deja deposés sont ouverts.");
+		currentphase++;
+		Level lastlevel = cavelist.get(cavelist.size() - 1).levels.get(cavelist.get(cavelist.size() - 1).levels.size() - 1);
 		for (Player players : playerlist) {
 			for (Chest chests : players.playerchestlist) {
-				cavelist.get(cavelist.size() - 1).levels.get(cavelist.get(cavelist.size() - 1).levels.size() - 1).chestlist.add(chests);
-				players.playerchestlist.remove(chests);
+				lastlevel.chestlist.add(chests);
 				players.currentcave = 0;
 				players.currentlevel = 0;
-				levelRemoval(cavelist);
 			}
+			players.playerchestlist.clear();
+			int gain = 0;
 			for (Chest chests : players.playerupchestlist) {
-				players.score += chests.openChest();
+				gain += chests.openChest();
 			}
-			System.out.println(players.name + " a gagné " + players.score + " trésors");
+			players.playerupchestlist.clear();
+			players.score += gain;
+			System.out.println(players.name + " a gagné " + gain + " trésors");
 		}
 	}
 
 	public static int breathing(Player joueur) {
 		return (joueur.playerchestlist.size() + 1);
-
 	}
 
 	public static void levelRemoval(List<Cave> cavelisting) {
+		List<Level> toremove = new ArrayList<>();
 		for (Cave cave : cavelisting) {
 			for (Level level : cave.levels) {
 				if (level.chestlist.isEmpty()) {
-					cave.levels.remove(level);
+					toremove.add(level);
 				}
 			}
+			cave.levels.removeAll(toremove);
 		}
 	}
 
-	public void caculateScore() {
-
-	}
-
-	public void launchGame() {
-
+	public void launchGame(/* int nbparties */) {
+		// phasenumber = nbparties;
+		System.out.println("test");
+		gameplay();
+		for (int i = 0; i < phasenumber; ++i) {
+		}
 	}
 
 }
