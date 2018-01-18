@@ -6,9 +6,14 @@ public class test {
 
 	public static void main(String[] args) {
 		// TODO Auto-generated method stub
-		Random random =new Random ();
-		int randomchest = random.nextInt(10);
-		System.out.println(randomchest);
+		List<Integer> disorder = new ArrayList<>();
+		for (int i =0; i<10;++i) {
+			disorder.add(1);
+		}
+		System.out.println(disorder.size());
+		disorder.remove(1);
+		disorder.remove(1);
+		System.out.println(disorder.size());
 	}
 
 }
