@@ -3,12 +3,14 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
+import java.util.Timer;
 import java.util.concurrent.Phaser;
 
 public class Game {
 	static int oxygen;
+	static int oxygenmax;
 	static int phasenumber;
-	static int currentphase = 0;
+	static int currentphase = 1;
 	static String action;
 	static Boolean confirmedaction = false;
 	static List<Integer> playingorderlist = new ArrayList<>();
@@ -16,8 +18,8 @@ public class Game {
 	static List<Cave> cavelist = new ArrayList<Cave>();
 	static Random random = new Random();
 
-	public Game(int oxygen, int phaseNumber, List<Player> playerlist, List<Cave> cavelist) {
-		this.oxygen = oxygen;
+	public Game(int oxygenmax, int phasenumber, List<Player> playerlist, List<Cave> cavelist) {
+		this.oxygenmax = oxygenmax;
 		this.phasenumber = phasenumber;
 		this.playerlist = playerlist;
 		this.cavelist = cavelist;
@@ -27,12 +29,13 @@ public class Game {
 	}
 
 	public static void gameplay() {
-		while (oxygen > 0) {
+		while (currentphase <= phasenumber) {
 			playingorderlist = playingOrder(playerlist);
-			for (int i : playingorderlist) {
+			for (int i = 0; i < playingorderlist.size(); ++i) {
+				int valeurordrejoueurs = playingorderlist.get(i);
 				confirmedaction = false;
 				while (!confirmedaction) {
-					Player joueur = playerlist.get(i);
+					Player joueur = playerlist.get(valeurordrejoueurs);
 					Cave cave = cavelist.get(joueur.currentcave);
 					Level niveau = cave.levels.get(joueur.currentlevel);
 					testons(joueur, niveau);
@@ -46,18 +49,17 @@ public class Game {
 					System.out.println("--------------------------------------------------------------------------");
 				}
 				if (oxygen < 1) {
+					i = playingorderlist.size();
 					endPhase(playingorderlist);
 				}
 			}
 		}
-		System.out.println("test plus d'oxygene :D");
 	}
 
 	public static void endPhase(List<Integer> playingorderlist) {
 		oxygenEmpty();
 		levelRemoval(cavelist);
-		playingorderlist.clear();
-		confirmedaction = true;
+		launchGame();
 	}
 
 	public static void playTurn(Player joueur, Cave cave, Level niveau, String action) {
@@ -136,14 +138,17 @@ public class Game {
 		System.out.println("");
 		System.out.println(lastlevel.chestlist.size() + " derniere cave dernier niveau");
 		System.out.println(niveau.chestlist.size() + " niveau en cours");
+		System.out.println("Je parle de " + joueur.name);
 		System.out.println(joueur.playerchestlist.size() + " coffres en main");
 		System.out.println(joueur.playerupchestlist.size() + " a la surface");
 		System.out.println("");
 	}
 
 	public static List<Integer> playingOrder(List<Player> playerlist) {
-		List<Integer> order = new ArrayList<>();
 		List<Integer[]> disorder = new ArrayList<>();
+		List<Integer[]> temporaryorder = new ArrayList<>();
+		List<List<Integer[]>> separatedorder = new ArrayList<>();
+		List<Integer> order = new ArrayList<>();
 		Integer[] max = new Integer[2];
 		boolean found = false;
 		for (int i = 0; i < playerlist.size(); ++i) {
@@ -153,7 +158,6 @@ public class Game {
 			association[1] = (joueur.currentcave * 13 + joueur.currentlevel);
 			disorder.add(association);
 		}
-
 		max = disorder.get(0);
 		while (!disorder.isEmpty()) {
 			found = false;
@@ -164,11 +168,45 @@ public class Game {
 				}
 			}
 			if (!found) {
-				int randomplayer = random.nextInt(disorder.size());
-				max = disorder.get(randomplayer);
+				for (Integer i = 0; i < disorder.size(); ++i) {
+					if (disorder.get(i)[1] == max[1]) {
+						max = disorder.get(i);
+					}
+				}
 			}
-			order.add(max[0]);
+			temporaryorder.add(max);
 			disorder.remove(max);
+		}
+		max = temporaryorder.get(0);
+		List<Integer[]> insidelist = new ArrayList<>();
+		for (Integer[] i : temporaryorder) {
+			if (i[1] == max[1]) {
+				insidelist.add(i);
+			}
+			else {
+				max = i;
+				List<Integer[]> transfert = new ArrayList<>();
+				for (Integer[] j : insidelist) {
+					transfert.add(j);
+				}
+				separatedorder.add(transfert);
+				temporaryorder.removeAll(transfert);
+				insidelist.clear();
+			}
+		}
+		List<Integer[]> transfert = new ArrayList<>();
+		for (Integer[] j : insidelist) {
+			transfert.add(j);
+		}
+		separatedorder.add(transfert);
+		temporaryorder.removeAll(transfert);
+		insidelist.clear();
+		for (List<Integer[]> i : separatedorder) {
+			while (!i.isEmpty()) {
+				int randomplayer = random.nextInt(i.size());
+				order.add(i.get(randomplayer)[0]);
+				i.remove(randomplayer);
+			}
 		}
 		return (order);
 	}
@@ -188,8 +226,6 @@ public class Game {
 		for (Player players : playerlist) {
 			for (Chest chests : players.playerchestlist) {
 				lastlevel.chestlist.add(chests);
-				players.currentcave = 0;
-				players.currentlevel = 0;
 			}
 			players.playerchestlist.clear();
 			int gain = 0;
@@ -199,6 +235,8 @@ public class Game {
 			players.playerupchestlist.clear();
 			players.score += gain;
 			System.out.println(players.name + " a gagné " + gain + " trésors");
+			players.currentcave = 0;
+			players.currentlevel = 0;
 		}
 	}
 
@@ -206,23 +244,37 @@ public class Game {
 		return (joueur.playerchestlist.size() + 1);
 	}
 
-	public static void levelRemoval(List<Cave> cavelisting) {
+	public static void levelRemoval(List<Cave> cavelist) {
 		List<Level> toremove = new ArrayList<>();
-		for (Cave cave : cavelisting) {
+		for (int i = 1; i < cavelist.size(); ++i) {
+			Cave cave = cavelist.get(i);
 			for (Level level : cave.levels) {
 				if (level.chestlist.isEmpty()) {
 					toremove.add(level);
 				}
 			}
 			cave.levels.removeAll(toremove);
+			toremove.clear();
 		}
 	}
 
-	public void launchGame(/* int nbparties */) {
-		// phasenumber = nbparties;
-		System.out.println("test");
-		gameplay();
-		for (int i = 0; i < phasenumber; ++i) {
+	public static void launchGame() {
+		if (currentphase <= phasenumber) {
+			oxygen = oxygenmax;
+			System.out.println(oxygen);
+			gameplay();
+		}
+		else {
+			int winningindex = 0;
+			int max = playerlist.get(0).score;
+			for (int i = 0; i < playerlist.size(); ++i) {
+				if (playerlist.get(i).score > max) {
+					max = playerlist.get(i).score;
+					winningindex = i;
+				}
+			}
+			System.out.println(playerlist.get(winningindex).name + " est le grand gagnant !!! FELICITATIONS");
+
 		}
 	}
 
