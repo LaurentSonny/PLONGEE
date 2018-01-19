@@ -1,0 +1,184 @@
+import java.awt.Font;
+import java.awt.event.KeyEvent;
+import java.util.List;
+import edu.princeton.cs.introcs.StdDraw;
+
+public class Affichage {
+	static double scaleX;
+	static double scaleY;
+
+	public Affichage() {
+		// TODO Auto-generated constructor stub
+	}
+
+	public static void main(String[] args, List<Player> playerlist, List<Cave> cavelist) {
+		// StdDraw.setScale(Affichage.computingX(playerlist),
+		// Affichage.computingY(cavelist));
+
+	}
+
+	public static int computingX(List<Player> playerlist) {
+		return ((5 * playerlist.size()) + 4);
+	}
+
+	public static int computingY(List<Cave> cavelist) {
+		int nblvl = 0;
+		for (Cave cave : cavelist) {
+			nblvl += cave.levels.size() + 1;
+		}
+		return (nblvl + 2 * cavelist.size() + 4);
+	}
+
+	public static void generalDisplay() {
+		StdDraw.clear();
+		StdDraw.setPenColor(85, 221, 255);
+		StdDraw.filledRectangle(0, 0, 50, 50);
+		StdDraw.show();
+	}
+
+	public static void caveDisplay(List<Cave> cavelist, List<Player> playerlist) {
+		StdDraw.setPenColor(85, 255, 85);
+		scaleX = computingX(playerlist);
+		scaleY = computingY(cavelist);
+		System.out.println(scaleX + "/" + scaleY);
+		double caveY = 5.0;
+		for (int i = 0; i < cavelist.size(); ++i) {
+			Cave cave = cavelist.get(i);
+			caveY += (new Integer(cave.levels.size()).doubleValue() / 2);
+			StdDraw.filledRectangle(scaleX / 2, scaleY - caveY, (scaleX / 2) - 1, (new Integer(cave.levels.size() + 1).doubleValue()) / 2);
+			caveY += (new Integer(cave.levels.size()).doubleValue() / 2);
+			caveY += 2;
+		}
+	}
+
+	public static void levelDisplay(List<Cave> cavelist, List<Player> playerlist) {
+		StdDraw.setPenColor(StdDraw.BLACK);
+		scaleX = computingX(playerlist);
+		scaleY = computingY(cavelist);
+		StdDraw.setPenRadius(0.002);
+		double levelY = 5.0;
+		for (Cave cave : cavelist) {
+			for (Level level : cave.levels) {
+				StdDraw.line(1.5, scaleY - levelY, scaleX - 1.5, scaleY - levelY);
+				levelY++;
+			}
+			levelY += 2;
+		}
+	}
+
+	public static void chestDisplay(List<Cave> cavelist, List<Player> playerlist) {
+		StdDraw.setPenColor(212, 170, 0);// Gold
+		scaleX = computingX(playerlist);
+		scaleY = computingY(cavelist);
+		double chestY = 5.0;
+		for (Cave cave : cavelist) {
+			for (Level level : cave.levels) {
+				if (!level.chestlist.isEmpty()) {
+					StdDraw.filledRectangle(scaleX - 2, scaleY - chestY, 0.2, 0.2);
+				}
+				chestY++;
+			}
+			chestY += 2;
+		}
+	}
+
+	public static void textDisplay(List<Cave> cavelist, List<Player> playerlist, int oxygen) {
+		StdDraw.setPenColor(StdDraw.BLACK);
+		Font font = new Font("Sans Serif", Font.BOLD, 13);
+		StdDraw.setFont(font);
+		scaleX = computingX(playerlist);
+		scaleY = computingY(cavelist);
+		double textX = 0;
+		for (Player joueur : playerlist) {
+			textX = (playerlist.lastIndexOf(joueur) + 1) * 5;
+			StdDraw.text(textX, scaleY - 1, joueur.name);
+			StdDraw.text(textX, scaleY - 2, "Score : " + joueur.score);
+			StdDraw.text(textX, scaleY - 3, "Coffres : " + (joueur.playerchestlist.size() + joueur.playerupchestlist.size()));
+		}
+		StdDraw.text(scaleX / 2, 1.5, "Oxygene :" + Integer.toString(oxygen));
+	}
+
+	public static void playerDisplay(List<Cave> cavelist, List<Player> playerlist) {
+		StdDraw.setPenColor(StdDraw.BLUE);
+		scaleX = computingX(playerlist);
+		scaleY = computingY(cavelist);
+		double width = 0.5;
+		StdDraw.setPenRadius(width);
+		for (Player joueur : playerlist) {
+			double placeY = 5.0;
+			for (int i = 0; i < joueur.currentcave; ++i) {
+				Cave cave = cavelist.get(i);
+				for (Level level : cave.levels) {
+					placeY++;
+				}
+				placeY += 2;
+			}
+			placeY += joueur.currentlevel;
+			StdDraw.filledEllipse((playerlist.lastIndexOf(joueur) + 1) * 5, scaleY - placeY, width * (scaleX / scaleY), width);
+		}
+	}
+
+	public static void turnDisplay(int i, List<Player> playerlist) {
+		scaleX = computingX(playerlist);
+		Player joueur = playerlist.get(i);
+		StdDraw.setPenColor(StdDraw.BLACK);
+		StdDraw.text(scaleX / 2, 2.5, "Au tour du joueur " + joueur.name + " de jouer.");
+	}
+
+	public static void endGameDisplay(List<Cave> cavelist, List<Player> playerlist, int i) {
+		scaleX = computingX(playerlist);
+		scaleY = computingY(cavelist);
+		StdDraw.clear();
+		Player joueur = playerlist.get(i);
+		Font font2 = new Font("Sans Serif", Font.BOLD, 60);
+		StdDraw.setFont(font2);
+		StdDraw.setPenColor(StdDraw.GRAY);
+		StdDraw.text(scaleX / 2, (scaleY / 2) + 2.5, joueur.name);
+		StdDraw.text((scaleX / 2), (scaleY / 2) - 2.5, "gagne le jeu !!!");
+	}
+
+	public static String keyListenerDisplay() throws InterruptedException {
+		String action = "";
+		while (true) {
+			if (StdDraw.isKeyPressed(KeyEvent.VK_DOWN)) {
+				action = "d";
+				Thread.sleep(500);
+				return (action);
+			}
+			if (StdDraw.isKeyPressed(KeyEvent.VK_UP)) {
+				action = "m";
+				Thread.sleep(500);
+				return (action);
+			}
+			if (StdDraw.isKeyPressed(KeyEvent.VK_LEFT)) {
+				action = "a";
+				Thread.sleep(500);
+				return (action);
+			}
+			if (StdDraw.isKeyPressed(KeyEvent.VK_RIGHT)) {
+				action = "w";
+				Thread.sleep(500);
+				return (action);
+			}
+		}
+	}
+	
+	public static void mainPageDisplay(List<Cave> cavelist, List<Player> playerlist) throws InterruptedException {
+		scaleX = computingX(playerlist);
+		scaleY = computingY(cavelist);
+		Boolean detection =true;
+		Font font2 = new Font("Sans Serif", Font.BOLD, 60);
+		Font font1 = new Font("Sans Serif", Font.BOLD, 16);
+		StdDraw.setFont(font2);
+		StdDraw.text(scaleX / 2, (scaleY / 2) + 4, "Snorkunking");
+		StdDraw.setFont(font1);
+		StdDraw.text(scaleX / 2, (scaleY / 2) +1, "Appuyez sur 1 pour commencer la partie !");
+		while (detection) {
+			if (StdDraw.isKeyPressed(KeyEvent.VK_UP)) {
+				Thread.sleep(500);
+				detection=false;
+			}
+		}
+	}
+	
+}
