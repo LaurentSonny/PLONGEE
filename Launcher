@@ -2,29 +2,28 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 import java.util.Random;
+import edu.princeton.cs.introcs.StdDraw;
 
 public class Launcher {
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws InterruptedException {
 		// Classe de création de la partie
 		/*
 		 * Règles: 2 joueurs, 3 bouteilles d'oxygene, 3 caves séparées en niveaux de
 		 * profondeur, Chaque niveau contient un tresor, Chaque mouvement coute 1
 		 * oxygene.
 		 */
-		Scanner scanner = new Scanner(System.in);
 		Random random = new Random();
-		System.out.print("Veuillez entrer le nombre de joueurs :");
-		int nbjoueurs = scanner.nextInt();
-		nbjoueurs = 2;
-		System.out.println("Il y a"/* nbcaves */ + " 3 caves");
 		List<Cave> TteslesCaves = new ArrayList<>();
 		List<Player> Ttlesjoueurs = new ArrayList<>();
 		TteslesCaves = caveListCreator(2);
-		Ttlesjoueurs = playerCreator(nbjoueurs);
+		Ttlesjoueurs = playerCreator(2);
 		int oxygenmax = oxygenAmount(TteslesCaves);
+		StdDraw.setXscale(0, Affichage.computingX(Ttlesjoueurs));
+		StdDraw.setYscale(0, Affichage.computingY(TteslesCaves));
+		Affichage.mainPageDisplay(TteslesCaves, Ttlesjoueurs);
 		System.out.println("Vous avez droit à " + oxygenmax + " unités d'oxygène");
-		Game Jeu = new Game(oxygenmax, 3, Ttlesjoueurs, TteslesCaves);
+		Game Jeu = new Game(oxygenmax, 2, Ttlesjoueurs, TteslesCaves);
 		Jeu.launchGame();
 	}
 
@@ -57,7 +56,7 @@ public class Launcher {
 		cavelist.add(surface);
 		for (int i = 0; i < cavenumber; ++i) {
 			lvlnumber = random.nextInt(4) + (i * 3) + 2;
-			lvlnumber = 3;
+			lvlnumber = 10;
 			System.out.println("La cave n°" + (i + 1) + " à pour longueur : " + lvlnumber);
 			Cave cave = new Cave(i, levelListCreator(lvlnumber, i));
 			cavelist.add(cave);
