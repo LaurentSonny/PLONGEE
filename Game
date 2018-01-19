@@ -1,10 +1,8 @@
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.Scanner;
-import java.util.Timer;
-import java.util.concurrent.Phaser;
+import edu.princeton.cs.introcs.StdDraw;
 
 public class Game {
 	static int oxygen;
@@ -25,23 +23,34 @@ public class Game {
 		this.cavelist = cavelist;
 	}
 
-	public static void main(String[] args, List<Player> playerlist, List<Cave> cavelist) {
+	public static void Display() {
+		Affichage.generalDisplay();
+		Affichage.caveDisplay(cavelist, playerlist);
+		Affichage.levelDisplay(cavelist, playerlist);
+		Affichage.chestDisplay(cavelist, playerlist);
+		Affichage.textDisplay(cavelist, playerlist, oxygen);
+		Affichage.playerDisplay(cavelist, playerlist);
 	}
 
-	public static void gameplay() {
+	public static void gameplay() throws InterruptedException {
 		while (currentphase <= phasenumber) {
 			playingorderlist = playingOrder(playerlist);
 			for (int i = 0; i < playingorderlist.size(); ++i) {
 				int valeurordrejoueurs = playingorderlist.get(i);
+				Display();
+				Affichage.turnDisplay(valeurordrejoueurs, playerlist);
+				for ( int k : playingorderlist) {
+					System.out.println(k);
+				}
 				confirmedaction = false;
 				while (!confirmedaction) {
 					Player joueur = playerlist.get(valeurordrejoueurs);
 					Cave cave = cavelist.get(joueur.currentcave);
 					Level niveau = cave.levels.get(joueur.currentlevel);
 					testons(joueur, niveau);
-					Scanner sc = new Scanner(System.in);
 					System.out.println(joueur.name + " à votre tour de jouer, veuillez taper:\r\n m pour monter \r\n d pour descendre \r\n a pour recuperer un coffre ");
-					String action = sc.nextLine();
+					//Scanner sc = new Scanner(System.in);
+					String action =Affichage.keyListenerDisplay();
 					playTurn(joueur, cave, niveau, action);
 					System.out.println("");
 					System.out.println(joueur.name + " est à " + (joueur.currentlevel + 1) + " de profondeur dans la cave " + joueur.currentcave);
@@ -56,7 +65,7 @@ public class Game {
 		}
 	}
 
-	public static void endPhase(List<Integer> playingorderlist) {
+	public static void endPhase(List<Integer> playingorderlist) throws InterruptedException {
 		oxygenEmpty();
 		levelRemoval(cavelist);
 		launchGame();
@@ -158,8 +167,12 @@ public class Game {
 			association[1] = (joueur.currentcave * 13 + joueur.currentlevel);
 			disorder.add(association);
 		}
-		max = disorder.get(0);
+		System.out.println("disorder");
+		for ( Integer[] k : disorder) {
+			System.out.println(k[1]);
+		}
 		while (!disorder.isEmpty()) {
+			max = disorder.get(0);
 			found = false;
 			for (Integer i = 0; i < disorder.size(); ++i) {
 				if (disorder.get(i)[1] > max[1]) {
@@ -177,36 +190,46 @@ public class Game {
 			temporaryorder.add(max);
 			disorder.remove(max);
 		}
+		System.out.println("temporaryorder");
+		for ( Integer[] k : temporaryorder) {
+			System.out.println(k[1]);
+		}
 		max = temporaryorder.get(0);
 		List<Integer[]> insidelist = new ArrayList<>();
-		for (Integer[] i : temporaryorder) {
-			if (i[1] == max[1]) {
-				insidelist.add(i);
+		for (Integer[] index : temporaryorder) {
+			if (index[1] == max[1]) {
+				insidelist.add(index);
 			}
 			else {
-				max = i;
-				List<Integer[]> transfert = new ArrayList<>();
-				for (Integer[] j : insidelist) {
-					transfert.add(j);
-				}
-				separatedorder.add(transfert);
-				temporaryorder.removeAll(transfert);
+				max = index;
+				List<Integer[]> insidelist2 = new ArrayList<>();
+				insidelist2.addAll(insidelist);
 				insidelist.clear();
+				insidelist.add(index);
+				separatedorder.add(insidelist2);
 			}
 		}
-		List<Integer[]> transfert = new ArrayList<>();
-		for (Integer[] j : insidelist) {
-			transfert.add(j);
-		}
-		separatedorder.add(transfert);
-		temporaryorder.removeAll(transfert);
+		List<Integer[]> insidelist2 = new ArrayList<>();
+		insidelist2.addAll(insidelist);
 		insidelist.clear();
+		separatedorder.add(insidelist2);
+		temporaryorder.removeAll(insidelist2);
+		System.out.println("separatedorder");
+		for ( List<Integer[]> k : separatedorder) {
+			for ( Integer[] j : k) {
+			System.out.println(j[1]);
+			}
+		}
 		for (List<Integer[]> i : separatedorder) {
 			while (!i.isEmpty()) {
 				int randomplayer = random.nextInt(i.size());
 				order.add(i.get(randomplayer)[0]);
 				i.remove(randomplayer);
 			}
+		}
+		System.out.println("order");
+		for ( Integer k : order) {
+			System.out.println(k);
 		}
 		return (order);
 	}
@@ -258,10 +281,12 @@ public class Game {
 		}
 	}
 
-	public static void launchGame() {
+	public static void launchGame() throws InterruptedException {
 		if (currentphase <= phasenumber) {
 			oxygen = oxygenmax;
 			System.out.println(oxygen);
+			StdDraw.setXscale(0, Affichage.computingX(playerlist));
+			StdDraw.setYscale(0, Affichage.computingY(cavelist));
 			gameplay();
 		}
 		else {
@@ -273,6 +298,7 @@ public class Game {
 					winningindex = i;
 				}
 			}
+			Affichage.endGameDisplay(cavelist, playerlist, winningindex);
 			System.out.println(playerlist.get(winningindex).name + " est le grand gagnant !!! FELICITATIONS");
 
 		}
